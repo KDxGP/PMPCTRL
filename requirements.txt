@@ -1,6 +1,6 @@
-bmp280==1.0.0
-fastapi==0.115.7
-pandas==2.2.3
-pydantic==2.10.6
-smbus2==0.5.0
-uvicorn==0.34.0
+bmp280
+fastapi
+pandas
+pydantic
+smbus2
+uvicorn
