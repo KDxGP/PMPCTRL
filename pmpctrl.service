@@ -1,0 +1,11 @@
+[Unit]
+Description=KDxGP PMPCTRL
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 -m pmpctrl -c config.ini
+WorkingDirectory=/opt/PMPCTRL
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
