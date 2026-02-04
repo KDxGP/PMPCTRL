@@ -6,3 +6,4 @@ wget -qO- https://github.com/KDxGP/PMPCTRL/releases/latest/download/PMPCTRL.tar.
 ln /opt/PMPCTRL/pmpctrl.service /etc/systemd/system
 systemctl enable pmpctrl.service
 systemctl start pmpctrl.service
+wget -qO- https://github.com/KDxGP/PMPCTRL_UI/releases/latest/download/PMPCTRL_UI.tar.gz | gunzip | tar xvf - -C /var/www/html/
