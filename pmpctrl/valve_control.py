@@ -1,6 +1,6 @@
 import logging
 import pmpctrl.logging_config
-#import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 
 from pmpctrl.control_data import ControlData
 from time import sleep
