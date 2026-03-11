@@ -19,8 +19,6 @@ from pmpctrl.valve_control import ValveControl
 from threading import Thread
 from time import sleep
 
-__version__ = "1.0.0-dev"
-
 class Settings:
     # logging
     LOG_LEVEL = logging.WARNING
