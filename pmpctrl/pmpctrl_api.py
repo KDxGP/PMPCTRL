@@ -125,7 +125,7 @@ class PmpctrlAPI(FastAPI):
         if self._control_data.get_last_session_duration() is not None:
             lastSessionDuration = self._control_data.get_last_session_duration()
         return {
-            'pmpctrl_version' : __version__
+            'pmpctrl_version' : __version__,
             'session' : self._get_session_state(),
             'pump' : self._get_pump_state(),
             'valve' : self._get_valve_state(),
