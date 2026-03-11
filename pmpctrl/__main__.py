@@ -83,15 +83,15 @@ def parse_config(control_data: ControlData, config_file: str) -> Settings:
     settings.VALVE_CONTROL_PIN_NUMBER = config.getint('valve_control', 'pin_number')
 
     # mode_hold
-    control_data.set_pressure_target = config.getfloat('mode_hold', 'pressure_target')
+    control_data.set_pressure_target(config.getfloat('mode_hold', 'pressure_target'))
 
     # mode_interval
-    control_data.set_mode_interval_peak_pressure = config.getfloat('mode_interval', 'peak_pressure')
-    control_data.set_mode_interval_time = config.getfloat('mode_interval', 'interval_time')
+    control_data.set_mode_interval_peak_pressure(config.getfloat('mode_interval', 'peak_pressure'))
+    control_data.set_mode_interval_time(config.getfloat('mode_interval', 'interval_time'))
 
     # mode_pulsating
-    control_data.set_mode_pulsating_pump_time = config.getfloat('mode_pulsating', 'pump_time')
-    control_data.set_mode_pulsating_release_time = config.getfloat('mode_pulsating', 'release_time')
+    control_data.set_mode_pulsating_pump_time(config.getfloat('mode_pulsating', 'pump_time'))
+    control_data.set_mode_pulsating_release_time(config.getfloat('mode_pulsating', 'release_time'))
 
     return settings
 
