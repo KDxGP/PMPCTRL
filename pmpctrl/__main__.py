@@ -20,14 +20,20 @@ from threading import Thread
 from time import sleep
 
 class Settings:
+    # logging
     LOG_LEVEL = logging.WARNING
+    # api
     API_PORT = 8000
+    # pressure_control
     PRESSURE_CONTROL_CYCLE_TIME = 0.01
+    # pressure_sensor
     PRESSURE_SENSOR_CYCLE_TIME = 0.01
     PRESSURE_SENSOR_BUS_NR = 1
     PRESSURE_SENSOR_I2C_ADR = 0x76
+    # pump_control
     PUMP_CONTROL_CYCLE_TIME = 0.5
     PUMP_CONTROL_PIN_NUMBER = 24
+    # valve_coontrol
     VALVE_CONTROL_CYCLE_TIME = 0.1
     VALVE_CONTROL_PIN_NUMBER = 23
 
@@ -43,6 +49,7 @@ def parse_config(control_data: ControlData, config_file: str) -> Settings:
     config.read(config_file)
     settings = Settings
 
+    # logging
     config_log_level = config.get('logging', 'log_level')
     logging_log_levels = logging.getLevelNamesMapping().items()
     for key, value in logging_log_levels:
@@ -51,19 +58,40 @@ def parse_config(control_data: ControlData, config_file: str) -> Settings:
 
     control_data.set_log_level(settings.LOG_LEVEL)
 
+    # api
     settings.API_PORT = config.getint('api', 'port')
+
+    # pressure_control
     settings.PRESSURE_CONTROL_CYCLE_TIME = config.getfloat('pressure_control', 'cycle_time')
-    
     control_data.set_pressure_target_tolerance_plus(config.getfloat('pressure_control', 'tolerance_plus'))
     control_data.set_pressure_target_tolerance_minus(config.getfloat('pressure_control', 'tolerance_minus'))
+    control_data.set_pressure_setpoint(config.getfloat('pressure_control', 'setpoint'))
+    control_data.set_pressure_max(config.getfloat('pressure_control', 'pressure_max'))
+    control_data.set_pressure_min(config.getfloat('pressure_control', 'pressure_min'))
 
+    # pressure_sensor
     settings.PRESSURE_SENSOR_CYCLE_TIME = config.getfloat('pressure_sensor', 'cycle_time')
     settings.PRESSURE_SENSOR_BUS_NR = config.getint('pressure_sensor', 'smbus_nr')
     settings.PRESSURE_SENSOR_I2C_ADR = int(config.get('pressure_sensor', 'i2c_address'), 0)
+
+    # pump_control
     settings.PUMP_CONTROL_CYCLE_TIME = config.getfloat('pump_control', 'cycle_time')
     settings.PUMP_CONTROL_PIN_NUMBER = config.getint('pump_control', 'pin_number')
+
+    # valve_control
     settings.VALVE_CONTROL_CYCLE_TIME = config.getfloat('valve_control', 'cycle_time')
     settings.VALVE_CONTROL_PIN_NUMBER = config.getint('valve_control', 'pin_number')
+
+    # mode_hold
+    control_data.set_pressure_target = config.config.getfloat('mode_hold', 'pressure_target')
+
+    # mode_interval
+    control_data.set_mode_interval_peak_pressure = config.config.getfloat('mode_interval', 'peak_pressure')
+    control_data.set_mode_interval_time = config.config.getfloat('mode_interval', 'interval_time')
+
+    # mode_pulsating
+    control_data.set_mode_pulsating_pump_time = config.config.getfloat('mode_pulsating', 'pump_time')
+    control_data.set_mode_pulsating_release_time = config.config.getfloat('mode_pulsating', 'release_time')
 
     return settings
 
