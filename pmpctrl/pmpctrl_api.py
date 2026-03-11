@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from fastapi import FastAPI
 from fastapi import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pmpctrl import __version__
+from pmpctrl.__main__ import __version__
 from pmpctrl.control_data import ControlData
 from pydantic import BaseModel
 from typing import Literal
