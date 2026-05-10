@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pmpctrl.control_data import ControlData
 from pydantic import BaseModel
 from typing import Literal
-from _version import __version__
+from ._version import __version__
 
 class ErrorMessage(BaseModel):
     status: int
