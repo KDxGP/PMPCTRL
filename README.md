@@ -11,3 +11,8 @@
 ## Documentation
 
 Visit [https://www.kdxgp.com/pmpctrl](https://www.kdxgp.com/pmpctrl) to view the full documentation.
+
+## Change Log
+### v1.0.1
+- all settings adjustable in config.ini
+- checks (not all) when parsing config.ini
