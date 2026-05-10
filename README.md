@@ -12,7 +12,11 @@
 
 Visit [https://www.kdxgp.com/pmpctrl](https://www.kdxgp.com/pmpctrl) to view the full documentation.
 
-## Change Log
+## Changelog
+### v1.0.3
+- added parsing missing config.ini values
+- added checks in API when setting values
+
 ### v1.0.2
 - all settings adjustable in config.ini
 - checks (not all) when parsing config.ini
