@@ -19,6 +19,8 @@ from pmpctrl.valve_control import ValveControl
 from threading import Thread
 from time import sleep
 
+__version__ = '1.0.1-dev'
+
 class Settings:
     # logging
     LOG_LEVEL = logging.WARNING
@@ -106,65 +108,110 @@ def parse_config(config_file: str) -> Settings:
 
         # [pressure_control]
         # cycle_time
-        # TODO
-        settings.PRESSURE_CONTROL_CYCLE_TIME = ini_pressure_control_cycle_time
+        # > 0s
+        if ini_pressure_control_cycle_time > 0:
+            settings.PRESSURE_CONTROL_CYCLE_TIME = ini_pressure_control_cycle_time
+        else:
+            logger.error(f"config.ini pressure control cycle time mus be greater 0, using default value {settings.PRESSURE_CONTROL_CYCLE_TIME}")
 
         # tolerance_plus
-        # check if in range
+        # check if in reasonable range
         if 0.0 <= ini_pressure_control_tolerance_plus <= 50.0:
             settings.PRESSURE_CONTROL_TOLERANCE_PLUS = ini_pressure_control_tolerance_plus
         else:
             logger.error(f"config.ini: pressure target tolerance PLUS+ not in range (0-50), using default value {settings.PRESSURE_CONTROL_TOLERANCE_PLUS}")
             
         # tolerance_minus
-        # check if in range
+        # check if in reasonable range
         if 0.0 <= ini_pressure_control_tolerance_minus <= 50.0:
             settings.PRESSURE_CONTROL_TOLERANCE_MINUS = ini_pressure_control_tolerance_minus
         else:
             logger.error(f"config.ini: pressure target tolerance MINUS- not in range (0-50), using default value {settings.PRESSURE_CONTROL_TOLERANCE_MINUS}")
             
         # setpoint
-        # TODO
-        # check if in range, but what range? min/max?
-        settings.PRESSURE_CONTROL_SETPOINT = ini_pressure_control_setpoint
+        # check if in reasnable range
+        # highest ever recorded athmospheric pressue: 1084.8 mbar
+        # lowest non-tornadic ever recorded: 870 mbar
+        if 1084.8 >= ini_pressure_control_setpoint >= 870:
+            settings.PRESSURE_CONTROL_SETPOINT = ini_pressure_control_setpoint
+        else:
+            logger.error(f"config.ini: pressure setpoint must be within reasnonable range, using default value {settings.PRESSURE_CONTROL_SETPOINT}")
         
         # [pressure_sensor]
-        # TODO
-        settings.PRESSURE_SENSOR_CYCLE_TIME = ini_pressure_sensor_cycle_time
-        settings.PRESSURE_SENSOR_BUS_NR = ini_pressure_sensor_bus_nr
-        settings.PRESSURE_SENSOR_I2C_ADR = ini_pressure_sensor_i2c_adr
+        # >0s
+        if ini_pressure_sensor_cycle_time > 0:
+            settings.PRESSURE_SENSOR_CYCLE_TIME = ini_pressure_sensor_cycle_time
+        else:
+            logger.error(f"config.ini: pressure sensor cyle time must be greater 0, using default value {settings.PRESSURE_SENSOR_CYCLE_TIME}")
+
+        if ini_pressure_sensor_bus_nr == 0 or ini_pressure_sensor_bus_nr == 1:
+            settings.PRESSURE_SENSOR_BUS_NR = ini_pressure_sensor_bus_nr
+        else:
+            logger.error(f"config.ini: pressue sensore bus number must be 0 or 1, using default value {settings.PRESSURE_SENSOR_BUS_NR}")
+        
+        # I2C address range is 0x00 - 0x7f
+        if 0x00 <= ini_pressure_sensor_i2c_adr <= 0x7f:
+            settings.PRESSURE_SENSOR_I2C_ADR = ini_pressure_sensor_i2c_adr
+        else:
+            logger.error(f"config.ini: pressure sensore I2C address not in range of 0x00-0x7F, using default value {settings.PRESSURE_SENSOR_I2C_ADR}")
 
         # [pump_control]
+        # cylce_time
+        if ini_pump_control_cycle_time > 0:
+            settings.PUMP_CONTROL_CYCLE_TIME = ini_pump_control_cycle_time
+        else:
+            logger.error(f"config.ini: pump control cylce time must be greater 0, using defaul value{settings.PUMP_CONTROL_CYCLE_TIME}")
+        # pin number
         # TODO
-        settings.PUMP_CONTROL_CYCLE_TIME = ini_pump_control_cycle_time
         settings.PUMP_CONTROL_PIN_NUMBER = ini_pump_control_pin_number
 
         # [valve_control]
+        # cylce_time
+        # >0s
+        if ini_valve_control_cycle_time > 0:
+            settings.VALVE_CONTROL_CYCLE_TIME = ini_valve_control_cycle_time
+        else:
+            logger.error(f"config.ini: valve control cylce time mus be greater 0, using default value {settings.VALVE_CONTROL_CYCLE_TIME}")
+        # pin number
         # TODO
-        settings.VALVE_CONTROL_CYCLE_TIME = ini_valve_control_cycle_time
         settings.VALVE_CONTROL_PIN_NUMBER = ini_valve_control_pin_number
 
         # [mode_hold]
-        # TODO
         # target between min/max
-        settings.MODE_HOLD_PRESSURE_TARGET = ini_mode_hold_pressure_target
+        if settings.PRESSURE_CONTROL_PRESSURE_MAX >= ini_mode_hold_pressure_target >= settings.PRESSURE_CONTROL_PRESSURE_MIN:
+            settings.MODE_HOLD_PRESSURE_TARGET = ini_mode_hold_pressure_target
+        else:
+            logger.error(f"config.ini: hold mode pressure target not within MIN/MAX range, using default value {settings.MODE_HOLD_PRESSURE_TARGET}")
         
         # [mode_interval]
         # peak_pressure
-        # TODO
         # in range min/max
-        settings.MODE_INTERVAL_PEAK_PRESSURE = ini_mode_interval_peak_pressure
+        if settings.PRESSURE_CONTROL_PRESSURE_MAX >= ini_mode_interval_peak_pressure >= settings.PRESSURE_CONTROL_PRESSURE_MIN:
+            settings.MODE_INTERVAL_PEAK_PRESSURE = ini_mode_interval_peak_pressure
+        else:
+            logger.error(f"config.ini: interval mode peak pressure not within MIN/MAX range, using default value {settings.MODE_INTERVAL_PEAK_PRESSURE}")
+        
         # interval_time
-        # >0s?
-        settings.MODE_INTERVAL_INTERVAL_TIME = ini_mode_interval_interval_time
+        # >0s
+        if ini_mode_interval_interval_time > 0:
+            settings.MODE_INTERVAL_INTERVAL_TIME = ini_mode_interval_interval_time
+        else:
+            logger.error(f"config.ini: interval mode time must be greater than 0, using default value {settings.MODE_INTERVAL_INTERVAL_TIME}")
 
         # [mode_pulsating]
         # pump_time
-        # >0s?
-        settings.MODE_PULSATING_PUMP_TIME = ini_mode_pulsating_pump_time
+        # >0s
+        if ini_mode_pulsating_pump_time > 0:
+            settings.MODE_PULSATING_PUMP_TIME = ini_mode_pulsating_pump_time
+        else:
+            logger.error(f"config.ini: pulsating mode pump time must be greater 0, using default value {settings.MODE_PULSATING_PUMP_TIME}")
         # release_time
-        # >0s? but smaller than overheating valve[]
-        settings.MODE_PULSATING_RELEASE_TIME = ini_mode_pulsating_release_time
+        # >0s
+        # TODO: should be smaller than overheating time of valve, no idea how long coil can be energiszed without issues
+        if ini_mode_pulsating_release_time > 0:
+            settings.MODE_PULSATING_RELEASE_TIME = ini_mode_pulsating_release_time
+        else:
+            logger.error(f"config.ini: pulsating mode release time must be greater 0, using default value {settings.MODE_PULSATING_RELEASE_TIME}")
     except Exception as e:
         logger.error(f"config.ini: non-valid values, using defaults")
         logger.error(f"config.ini: {e}")
