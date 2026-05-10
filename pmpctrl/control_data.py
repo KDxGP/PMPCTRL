@@ -1,7 +1,8 @@
-import datetime
-
 from threading import Event
 from threading import Lock
+
+import datetime
+
 
 class ControlData:
     _instance = None
@@ -29,7 +30,7 @@ class ControlData:
     _time_utc_now: datetime.datetime
     _time_utc_session_start: datetime.datetime
     _last_session_duration: int
-    
+
     _pressure_actual: float
     _pressure_setpoint: float
     _pressure_target: float
@@ -50,7 +51,7 @@ class ControlData:
             with cls._lock:
                 if cls._instance is None:
                     cls._instance = super().__new__(cls)
-                    
+
                     cls.event_run = Event()
                     cls.event_error = Event()
                     cls.event_session_on = Event()
@@ -70,7 +71,8 @@ class ControlData:
                     cls._last_session_duration = None
 
                     #cls._pressure_setpoint = 1013.25 # sea level
-                    # avg. human population 435m above seal level, air pressure 20°C at 435m -> 962.9274mbar
+                    # avg. human population 435m above seal level,
+                    # air pressure 20°C at 435m -> 962.9274mbar
                     cls._pressure_setpoint = 962.9274
                     cls._pressure_target_tolerance_minus = 10.0
                     #cls._pressure_tolerance_minus = 3.38639 # ~0.1inHg
@@ -98,9 +100,11 @@ class ControlData:
         with self._lock:
             self._log_level = log_level
 
+
     def get_log_level(self) -> int:
         with self._lock:
             return self._log_level
+
 
     # mode
     def set_mode(self, mode: int):
@@ -117,18 +121,22 @@ class ControlData:
             elif mode == ControlData.MODE_EXPERIMENTAL:
                 self._mode = ControlData.MODE_EXPERIMENTAL
 
+
     def get_mode(self) -> int:
         with self._lock:
             return self._mode
+
 
     # time / duration
     def get_time_utc_now(self) -> datetime.datetime:
         with self._lock:
             return self._time_utc_now
 
+
     def set_time_utc_now(self):
         with self._lock:
             self._time_utc_now = datetime.datetime.utcnow()
+
 
     def get_time_utc_session_start(self) -> datetime.datetime:
         with self._lock:
@@ -136,9 +144,11 @@ class ControlData:
                 return None
             return self._time_utc_session_start
 
+
     def set_time_utc_session_start(self):
         with self._lock:
             self._time_utc_session_start = datetime.datetime.utcnow()
+
 
     def get_last_session_duration(self) -> int:
         with self._lock:
@@ -146,114 +156,139 @@ class ControlData:
                 return None
             return self._last_session_duration
 
+
     def set_last_session_duration(self):
         with self._lock:
-            self._last_session_duration = (self._time_utc_now - self._time_utc_session_start).seconds
+            duration = self._time_utc_now - self._time_utc_session_start
+            self._last_session_duration = duration.seconds
+
 
     # pressure
     # pressure - actual
     def get_pressure_actual(self) -> float:
         with self._lock:
             return self._pressure_actual
-    
+
+
     def set_pressure_actual(self, pressure_actual: float):
         with self._lock:
             self._pressure_actual = pressure_actual
+
 
     # pressure - setpoint
     def get_pressure_setpoint(self) -> float:
         with self._lock:
             return self._pressure_setpoint
 
+
     def set_pressure_setpoint(self, setpoint: float):
         with self._lock:
             self._pressure_setpoint = setpoint
+
 
     # pressure - target
     def get_pressure_target(self) -> float:
         with self._lock:
             return self._pressure_target
-    
+
+
     def set_pressure_target(self, pressure_target: float):
         with self._lock:
             self._pressure_target = pressure_target
+
 
     # pressure - target - tolerance - minus
     def get_pressure_target_tolerance_minus(self) -> float:
         with self._lock:
             return self._pressure_target_tolerance_minus
 
+
     def set_pressure_target_tolerance_minus(self, tolerance_minus: float):
         with self._lock:
             self._pressure_target_tolerance_minus = abs(tolerance_minus)
+
 
     # pressure - target - tolerance - plus
     def get_pressure_target_tolerance_plus(self) -> float:
         with self._lock:
             return self._pressure_target_tolerance_plus
 
+
     def set_pressure_target_tolerance_plus(self, tolerance_plus: float):
         with self._lock:
             self._pressure_target_tolerance_plus = abs(tolerance_plus)
+
 
     # auto control pressure
     def get_pressure_control(self) -> bool:
         with self._lock:
             return self._pressure_control
 
+
     def set_pressure_control(self, pressure_control: bool):
         with self._lock:
             self._pressure_control = pressure_control
+
 
     # pressure - max
     def get_pressure_max(self) -> float:
         with self._lock:
             return self._pressure_max
 
+
     def set_pressure_max(self, max_pressure: float):
         with self._lock:
             self._pressure_max = abs(max_pressure)
+
 
     # pressure - min
     def get_pressure_min(self) -> float:
         with self._lock:
             return self._pressure_min
 
+
     def set_pressure_min(self, min_pressure: float):
         with self._lock:
             self._pressure_min = abs(min_pressure)
+
 
     # mode interval
     def get_mode_interval_peak_pressure(self) -> float:
         with self._lock:
             return self._mode_interval_peak_pressure
 
+
     def set_mode_interval_peak_pressure(self, peak_pressure: float):
         with self._lock:
             self._mode_interval_peak_pressure = peak_pressure
+
 
     def get_mode_interval_time(self) -> float:
         with self._lock:
             return self._mode_interval_time
 
+
     def set_mode_interval_time(self, interval_time: float):
         with self._lock:
             self._mode_interval_time = interval_time
+
 
     # mode pulsating
     def get_mode_pulsating_pump_time(self) -> float:
         with self._lock:
             return self._mode_pulsating_pump_time
 
+
     def set_mode_pulsating_pump_time(self, pump_time: float):
         with self._lock:
             self._mode_pulsating_pump_time = pump_time
+
 
     def get_mode_pulsating_release_time(self) -> float:
         with self._lock:
             return self._mode_pulsating_release_time
 
+
     def set_mode_pulsating_release_time(self, release_time: float):
         with self._lock:
             self._mode_pulsating_release_time = release_time
-

@@ -1,6 +1,6 @@
-import logging
-
 from time import gmtime
+
+import logging
 
 logging.Formatter.converter = gmtime
 

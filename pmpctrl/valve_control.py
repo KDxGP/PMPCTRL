@@ -1,9 +1,13 @@
+from time import sleep
+
 import logging
-import pmpctrl.logging_config
+
 import RPi.GPIO as GPIO
 
 from pmpctrl.control_data import ControlData
-from time import sleep
+
+import pmpctrl.logging_config
+
 
 class ValveControl:
     _logger: logging.Logger
@@ -11,7 +15,7 @@ class ValveControl:
     _cycle_time: float
     _pin_number: int
 
-    
+
     def __init__(self,
                  control_data: ControlData,
                  pin_number: int,
@@ -21,19 +25,19 @@ class ValveControl:
         self._control_data = control_data
         self._cycle_time = cycle_time
         self._pin_number = pin_number
-        
+
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self._pin_number, GPIO.OUT)
         GPIO.output(self._pin_number, GPIO.LOW)
-        
-   
+
+
     def _open_valve(self) -> None:
         self._logger.info('openeing valve')
         GPIO.output(self._pin_number, GPIO.HIGH)
         self._control_data.event_valve_state_closed.clear()
         self._control_data.event_valve_open.clear()
 
-    
+
     def _close_valve(self) -> None:
         self._logger.info('closing valve')
         GPIO.output(self._pin_number, GPIO.LOW)

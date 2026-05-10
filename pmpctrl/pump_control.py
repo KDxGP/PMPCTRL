@@ -1,10 +1,12 @@
+from time import sleep
+
 import logging
-import pmpctrl.logging_config
+
 import RPi.GPIO as GPIO
 
 from pmpctrl.control_data import ControlData
-from threading import Event
-from time import sleep
+
+import pmpctrl.logging_config
 
 
 class PumpControl:
@@ -71,7 +73,8 @@ class PumpControl:
         Returns:
             None
         """
-        self._logger.debug(f'setting pin {self._pin_number} to HIGH')
+        log_msg = f"setting pin {self._pin_number} to HIGH"
+        self._logger.debug(log_msg)
         GPIO.output(self._pin_number, GPIO.HIGH)
         self._control_data.event_pump_state_on.set()
         self._control_data.event_pump_turn_on.clear()
@@ -90,7 +93,8 @@ class PumpControl:
         Returns:
             None
         """
-        self._logger.debug(f'setting pin {self._pin_number} to LOW')
+        log_msg = f"setting pin {self._pin_number} to LOW"
+        self._logger.debug(log_msg)
         GPIO.output(self._pin_number, GPIO.LOW)
         self._control_data.event_pump_state_on.clear()
         self._control_data.event_pump_turn_off.clear()
@@ -127,9 +131,11 @@ class PumpControl:
                     self._power_off()
                 sleep(self._cycle_time)
             self._logger.info('EVENT_RUN is NOT set -> Exiting')
+
         except KeyboardInterrupt:
             self._logger.info('Program stopped by user through keyboard interrupt.')
             self._control_data.event_run.clear()
+
         finally:
             self._power_off()
             GPIO.cleanup(self._pin_number)

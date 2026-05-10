@@ -1,11 +1,15 @@
-import logging
-import pmpctrl.logging_config
-
-from bmp280 import BMP280
-from pmpctrl.control_data import ControlData
-from smbus2 import SMBus
 from statistics import fmean
 from time import sleep
+
+import logging
+
+from bmp280 import BMP280
+from smbus2 import SMBus
+
+from pmpctrl.control_data import ControlData
+
+import pmpctrl.logging_config
+
 
 class PressureSensor:
     _logger: logging.Logger
@@ -29,14 +33,15 @@ class PressureSensor:
         self._i2c_addr = i2c_addr
         self._bmp280_setup()
 
-        
+
     def _bmp280_setup(self):
         try:
             self._bus = SMBus(self._bus_nr)
             self._bmp280 = BMP280(i2c_dev=self._bus, i2c_addr=self._i2c_addr)
-            self._bmp280.setup(mode="forced")
+            self._bmp280.setup(mode='forced')
         except Exception as e:
-            self._logger.error(f'Failed to setup I2C sensor: {e}')
+            log_msg = f"Failed to setup I2C sensor: {e}"
+            self._logger.error(log_msg)
             raise
 
 
@@ -45,15 +50,19 @@ class PressureSensor:
             try:
                 pressure = self._bmp280.get_pressure()
                 if pressure is not None:
-                    self._logger.debug(f'pressure reading: {self._control_data.get_pressure_actual()}')
+                    log_msg = f"pressure reading: {self._control_data.get_pressure_actual()}"
+                    self._logger.debug(log_msg)
                     self._control_data.set_pressure_actual(pressure)
                     return pressure
+
             except Exception as e:
-                self._logger.warning(f'Could not read pressure, re-initalizing I2C, retry={retry}')
+                log_msg = f"Could not read pressure, re-initalizing I2C, retry={retry}"
+                self._logger.warning()
                 self._bus.close()
                 self._bmp280.setup()
                 sleep(1)
                 continue
+
         self._logger.error('Retries for reading pressure exceeded -> STOPPING')
         self._control_data.event_session_on.clear()
         self._control_data.event_run.clear()
@@ -70,11 +79,13 @@ class PressureSensor:
             sample = self._read()
             if sample is not None:
                 samples.append(sample)
-                self._logger.debug(f'sample {i} = {sample}')
+                log_msg = f"sample {i} = {sample}"
+                self._logger.debug(log_msg)
             sleep(wait_between_samples)
-        
+
         zero_point = fmean(samples)
-        self._logger.info(f'New zero point is  {zero_point}')
+        log_msg = f"New zero point is  {zero_point}"
+        self._logger.info(log_msg)
         self._control_data.set_pressure_setpoint(zero_point)
 
 
